@@ -1093,13 +1093,14 @@ module SymetrieCom
         private
           # override the sql preparation method to exclude the lft/rgt columns
           # under the same conditions that the primary key column is excluded
-          def attributes_with_quotes(include_primary_key = true, include_readonly_attributes = true) #:nodoc:
+          def attributes_with_quotes(include_primary_key = true, include_readonly_attributes = true, attribute_names = @attributes.keys) #:nodoc:
             left_and_right_column = [acts_as_nested_set_options[:left_column], acts_as_nested_set_options[:right_column]]
-            quoted = attributes.inject({}) do |quoted, (name, value)|
+            quoted = {}
+            connection = self.class.connection
+            attribute_names.each do |name|
               if column = column_for_attribute(name)
-                quoted[name] = quote_value(value, column) unless !include_primary_key && (column.primary || left_and_right_column.include?(column.name))
+                quoted[name] = connection.quote(read_attribute(name), column) unless !include_primary_key && (column.primary || left_and_right_column.include?(column.name))
               end
-              quoted
             end
             include_readonly_attributes ? quoted : remove_readonly_attributes(quoted)
           end

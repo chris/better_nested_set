@@ -119,6 +119,7 @@ module SymetrieCom
           # Loop through set using block
           # pass :nested => false when result is not fully parent-child relational
           # for example with filtered result sets
+          # Set options[:sort_on] to the name of a column you want to sort on (optional).
           def recurse_result_set(result, options = {}, &block)
             return result unless block_given? 
             inner_recursion = options.delete(:inner_recursion)
@@ -129,6 +130,7 @@ module SymetrieCom
             options[:nested] = true unless options.key?(:nested)
                    
             siblings = options[:nested] ? result_set.select { |s| s.parent_id == parent_id } : result_set           
+            siblings.sort! {|a,b| a.send(options[:sort_on]) <=> b.send(options[:sort_on])} if options[:sort_on]
             siblings.each do |sibling|
               result_set.delete(sibling)           
               block.call(sibling, options[:level])

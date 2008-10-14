@@ -134,7 +134,7 @@ module SymetrieCom
             siblings.each do |sibling|
               result_set.delete(sibling)           
               block.call(sibling, options[:level])
-              opts = { :parent_id => sibling.id, :level => options[:level] + 1, :inner_recursion => true }           
+              opts = { :parent_id => sibling.id, :level => options[:level] + 1, :inner_recursion => true, :sort_on => options[:sort_on]}           
               recurse_result_set(result_set, opts, &block) if options[:nested]
             end
             result_set.each { |orphan| block.call(orphan, options[:level]) } unless inner_recursion
